@@ -22,7 +22,7 @@ public class Handlowiec extends Pracownik {
         this.Pesel = pesel;
         this.Nazwisko = nazwisko;
         this.Imie = imie;
-        this.Stanowisko = "Dyrektor";
+        this.Stanowisko = "Handlowiec";
         this.Wynagrodzenie = wynagrodzenie;
         this.Telefon = numer;
         this.prowizja = prowizja;

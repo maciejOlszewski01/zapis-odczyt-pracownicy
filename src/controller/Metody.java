@@ -7,10 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.zip.*;
 
 import static com.company.Main.Lista;
@@ -18,7 +15,7 @@ import static com.company.Main.Lista;
 public class Metody<J> {
 
 
-    static Handlowiec dodaj_handlowiec(){
+    public static Handlowiec dodaj_handlowiec(){
         String pesel, imie, nazwisko;
         int wynagrodzenie, numer;
         BigDecimal prowizja;
@@ -52,7 +49,7 @@ public class Metody<J> {
         }
     }
 
-    static Dyrektor dodaj_Dyrektor(){
+    public static Dyrektor dodajDyrektor(){
         String pesel, imie, nazwisko;
         int wynagrodzenie, numer;
         BigDecimal dodatek;
@@ -98,7 +95,7 @@ public class Metody<J> {
         if(choice.equals("H")){
             return dodaj_handlowiec();
         }else if(choice.equals("D")){
-            return dodaj_Dyrektor();
+            return dodajDyrektor();
         } else{
             return null;
         }
@@ -301,24 +298,26 @@ public class Metody<J> {
                 System.out.print(counter_g(plik));
                 ExecutorService executor = Executors.newFixedThreadPool(10);
                 List<CompletableFuture<Pracownik>> completableFutureList = new ArrayList<>(Lista.size());
-                for(int i = 0; i < counter_g(plik);i++){
-                    int temp2 = i+1;
-                    String temp3 = Integer.toString(temp2);
-                    completableFutureList.add(CompletableFuture.supplyAsync(() -> {
-                        try {
-                            Pracownik temp = odczyt_p(plik, temp3);
-                            Lista.put(temp.getPesel(),temp);
-                            return temp;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    },executor));
 
+                    for (int i = 0; i < counter_g(plik); i++) {
+                        int temp2 = i + 1;
+                        String temp3 = Integer.toString(temp2);
+                        completableFutureList.add(CompletableFuture.supplyAsync(() -> {
+                            try {
+                                Pracownik temp = odczyt_p(plik, temp3);
+                                Lista.put(temp.getPesel(), temp);
+                                return temp;
+                            } catch (IOException | ClassNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }, executor));
+
+                    }
+                try {
+                    completableFutureList.forEach(CompletableFuture::join);
+                }catch(Exception e){
+                    System.out.print("\nERROR\n");
                 }
-                completableFutureList.forEach((a)->a.join());
             }else {
 
                 for(int i = 0; i < counter_z(plik);i++){
@@ -334,12 +333,9 @@ public class Metody<J> {
                             temp = odczyt_pz(plik, temp3);
                             Lista.put(temp.getPesel(), temp);
                             return temp;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
                         }
-                        return temp;
                     },executor));
                     completableFutureList.forEach((a)->a.join());
                 }

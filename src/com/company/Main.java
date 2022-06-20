@@ -66,7 +66,7 @@ public class Main {
                     System.out.print("-------------------------------\n");
                     if(c.equals("Z")){
 
-                        //ZAPIS KURWAAAAA
+
                     zapis();
                     break;
 
